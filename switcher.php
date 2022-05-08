@@ -3,6 +3,7 @@
 define('SYMLINK_FILE', 0);
 define('SYMLINK_DIR', 1);
 define('SYMLINK_JUNCTION', 2);
+
 function makeSymlink ($target, $link, $flag = SYMLINK_FILE) {
     switch ($flag) {
        case SYMLINK_DIR: $pswitch = '/d'; break;
@@ -27,8 +28,8 @@ foreach($directories as $key =>$directory) {
 
 $i = 1;
 foreach($directories as $directory) {
-	echo $i,': ',basename($directory),PHP_EOL;
-	$i++;
+    echo $i,': ',basename($directory),PHP_EOL;
+    $i++;
 }
 
 echo "Input index of PHP you want to have as a main version: ";
@@ -40,17 +41,20 @@ if(((int)$line <= 0 || (int)$line > count($directories))){
     exit;
 }
 
-
-
-echo "Input: ",$line,PHP_EOL;
+//echo "Input: ",$line,PHP_EOL;
 echo "Dir: ",$directories[(int)$line-1],PHP_EOL,PHP_EOL;
 
-rmdir('../../etc/php/_current');
-makeSymlink($directories[(int)$line-1], '../../etc/php/_current', SYMLINK_DIR);
+rmdir(__DIR__.'/../../etc/php/_current');
+makeSymlink($directories[(int)$line-1], __DIR__.'/../../etc/php/_current', SYMLINK_DIR);
 
-echo "Please add '",realpath('../../etc/php'),DIRECTORY_SEPARATOR,"_current' to PATH env. variable.",PHP_EOL,PHP_EOL;
+$winPath = getenv("PATH");
 
+$envPath = realpath(__DIR__.'/../../etc/php').DIRECTORY_SEPARATOR."_current";
 
-echo "--- PRESS ENTER TO CLOSE WINDOW ---";
+if(strpos($winPath, $envPath) === false) {
+    echo "Please add '\e[0;31m",$envPath,"\e[0m' to %PATH% windows environment variable and remove path to your current PHP version.",PHP_EOL,PHP_EOL;
+}
+
+echo "--- PRESS ENTER TO CLOSE WINDOW ---",PHP_EOL,PHP_EOL;
 fgets($handle);
 fclose($handle);
